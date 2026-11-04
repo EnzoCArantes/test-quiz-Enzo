@@ -1,6 +1,17 @@
 import pytest
 from model import Question
 
+@pytest.fixture
+def five_choice_question():
+    question = Question(title='q1', max_selections=5)
+
+    question.add_choice('a', False)
+    question.add_choice('b', True)
+    question.add_choice('c', False)
+    question.add_choice('d', True)
+    question.add_choice('e', False)
+
+    return question
 
 def test_create_question():
     question = Question(title='q1')
@@ -133,3 +144,11 @@ def test_correct_selected_choices_raises_exception_when_too_many_choices ():
 
     with pytest.raises(Exception):
         question.correct_selected_choices([question.choices[0].id, question.choices[1].id])
+
+def test_correct_selected_choices_returns_no_choices_when_all_incorrect (five_choice_question):
+    assert len(five_choice_question.correct_selected_choices([1, 3, 5])) == 0
+
+def test_correct_selected_choices_raises_no_exception_with_empty_list (five_choice_question):
+    assert len(five_choice_question.correct_selected_choices([])) == 0
+    five_choice_question.remove_all_choices()
+    assert len(five_choice_question.correct_selected_choices([])) == 0
